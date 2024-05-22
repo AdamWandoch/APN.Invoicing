@@ -14,7 +14,7 @@ public class OperationValidationService(IOperationRepository operationRepo, IUni
 
     public async Task<bool> IsOperationAllowedAsync(OperationPostDTO operation, CancellationToken token)
     {
-        var lastOpType = await GetLastTypeByCustomerIDServiceIDAsync(operation.CustomerID, operation.ServiceID, operation.Month, operation.Year, token);
+        var lastOpType = await _operationRepo.GetLastTypeByCustomerIDServiceIDAsync(operation.CustomerID, operation.ServiceID, operation.Month, operation.Year, token);
 
         if (lastOpType == 0 && operation.Type == EnumOperationType.Start) return true;
 
@@ -23,13 +23,8 @@ public class OperationValidationService(IOperationRepository operationRepo, IUni
             EnumOperationType.Start => lastOpType == EnumOperationType.Stop,
             EnumOperationType.Pause => lastOpType == EnumOperationType.Start || lastOpType == EnumOperationType.Restart,
             EnumOperationType.Restart => lastOpType == EnumOperationType.Pause,
-            EnumOperationType.Stop => lastOpType == EnumOperationType.Start || lastOpType == EnumOperationType.Pause,
+            EnumOperationType.Stop => lastOpType == EnumOperationType.Start || lastOpType == EnumOperationType.Restart,
             _ => false,
         };
-    }
-
-    public Task<EnumOperationType> GetLastTypeByCustomerIDServiceIDAsync(int customerID, int serviceID, short month, short year, CancellationToken token)
-    {
-        return _operationRepo.GetLastTypeByCustomerIDServiceIDAsync(customerID, serviceID, month, year, token);
     }
 }
