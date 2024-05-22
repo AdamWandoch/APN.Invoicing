@@ -1,4 +1,6 @@
-﻿namespace APN.Invoicing.Infrastructure.Repositories;
+﻿using APN.Invoicing.Domain.UnitOfWork;
+
+namespace APN.Invoicing.Infrastructure.Repositories;
 
 public class BaseRepository(IUnitOfWork unitOfWork)
 {

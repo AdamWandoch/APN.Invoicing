@@ -1,5 +1,6 @@
 ﻿using APN.Invoicing.Domain.Entities;
 using APN.Invoicing.Domain.Repositories;
+using APN.Invoicing.Domain.UnitOfWork;
 using Dapper;
 
 namespace APN.Invoicing.Infrastructure.Repositories;

@@ -2,6 +2,7 @@
 using APN.Invoicing.Application.ServiceInterfaces;
 using APN.Invoicing.Domain.Entities;
 using APN.Invoicing.Domain.Repositories;
+using APN.Invoicing.Domain.UnitOfWork;
 using AutoMapper;
 
 namespace APN.Invoicing.Application.Services;
