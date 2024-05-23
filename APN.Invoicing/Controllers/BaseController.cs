@@ -12,19 +12,36 @@ public class BaseController<T>(ILogger<T> logger) : ControllerBase
 
     protected ObjectResult HandleException(Exception ex)
     {
-        _logger.LogError(ex.Message);
+
+        if (ex is OperationsForInvoicingNotFoundException)
+        {
+            _logger.LogInformation(ex.Message);
+            return ObjectResult(ex, StatusCodes.Status409Conflict);
+        }
 
         if (ex is ValidationBaseException)
         {
-            return new ObjectResult(new { message = ex.Message })
-            {
-                StatusCode = StatusCodes.Status422UnprocessableEntity
-            };
+            _logger.LogWarning(ex.Message);
+            return ObjectResult(ex, StatusCodes.Status422UnprocessableEntity);
         }
 
-        return new ObjectResult(new { message = ex.Message, stackTrace = ex.StackTrace })
+        _logger.LogError(ex.Message);
+        return ObjectResult(ex, StatusCodes.Status500InternalServerError);
+    }
+
+    private static ObjectResult ObjectResult(Exception ex, int statusCode)
+    {
+        var showStackTrace =
+            ex is not OperationsForInvoicingNotFoundException &&
+            ex is not ValidationBaseException;
+
+        dynamic data = showStackTrace
+            ? new { message = ex.Message, stackTrace = ex.StackTrace }
+            : new { message = ex.Message };
+
+        return new ObjectResult(data)
         {
-            StatusCode = StatusCodes.Status500InternalServerError
+            StatusCode = statusCode
         };
     }
 }
