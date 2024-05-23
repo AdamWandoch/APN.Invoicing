@@ -91,8 +91,12 @@ public class InvoiceService(IUnitOfWork uow, IMapper mapper, IInvoiceRepository 
         return invoiceItems;
     }
 
-    public Task<InvoiceEntity> GetByCustomerMonthYearAsync(int customerID, short month, short year, CancellationToken token)
+    public async Task<InvoiceEntity> GetByCustomerMonthYearAsync(int customerID, short month, short year, CancellationToken token)
     {
-        return _invoiceRepo.GetByCustomerIDMonthYearAsync(customerID, month, year, token);
+        var result = await _invoiceRepo.GetByCustomerIDMonthYearAsync(customerID, month, year, token);
+
+        if (result != null) return result;
+
+        throw new CustomerDataNotFoundException($"No invoice found for customerID {customerID}, month {month} and year {year}.");
     }
 }

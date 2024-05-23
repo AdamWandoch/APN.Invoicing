@@ -43,8 +43,32 @@ public class InvoiceRepository(IUnitOfWork unitOfWork) : BaseRepository(unitOfWo
         return _uow.Conn.ExecuteAsync(new CommandDefinition(sSql, invoiceItems, transaction: _uow.Tx, cancellationToken: token));
     }
 
-    public Task<InvoiceEntity> GetByCustomerIDMonthYearAsync(int customerID, short month, short year, CancellationToken token)
+    public async Task<InvoiceEntity?> GetByCustomerIDMonthYearAsync(int customerID, short month, short year, CancellationToken token)
     {
-        throw new NotImplementedException();
+        var sSql = @"SELECT InvoiceID, CustomerID, [Date], [Month], [Year] 
+                    FROM INVOICE
+                    WHERE CustomerID = @customerID
+                    	AND [Month] = @month
+                    	AND [Year] = @year;
+                    
+                    SELECT InvItemID, II.InvoiceID, ServiceID, StartOperationID, StopOperationID, StartDate, EndDate, StartMonth, 
+                        EndMonth, StartYear, EndYear, [Value], Finished
+                    FROM INVOICE_ITEM II
+                    JOIN INVOICE I ON I.InvoiceID = II.InvoiceID
+                    	AND I.CustomerID = @customerID
+                    	AND I.[Month] = @month
+                    	AND I.[Year] = @year;";
+
+        var param = new { customerID, month, year };
+
+        var reader = await _uow.Conn.QueryMultipleAsync(new CommandDefinition(sSql, param, transaction: _uow.Tx, cancellationToken: token));
+
+        var invoice = await reader.ReadFirstOrDefaultAsync<InvoiceEntity>();
+        var invoiceItems = await reader.ReadAsync<InvoiceItemEntity>();
+
+        if (invoice != null)
+            return invoice with { Items = invoiceItems.ToList() };
+
+        return null;
     }
 }

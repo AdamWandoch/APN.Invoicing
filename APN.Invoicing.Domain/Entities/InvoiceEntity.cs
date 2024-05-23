@@ -9,7 +9,7 @@ public record InvoiceEntity(
     List<InvoiceItemEntity> Items)
 {
     /// <summary>
-    /// Default, parameterless constructor for object materialization with missing values
+    /// Default, parameterless constructor for object materialization
     /// </summary>
     public InvoiceEntity() : this(default, default, default, default, default, []) { }
 };
@@ -29,4 +29,13 @@ public record InvoiceItemEntity(
     short StartYear,
     short EndYear,
     decimal Value,
-    bool Finished);
+    bool Finished)
+{
+    /// <summary>
+    /// Default, parameterless constructor for object materialization
+    /// </summary>
+    public InvoiceItemEntity() : this(default, default, default, default, default, default,
+                             default, default, default, default, default, default, default)
+    { }
+};
+
