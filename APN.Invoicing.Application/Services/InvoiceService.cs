@@ -43,7 +43,7 @@ public class InvoiceService(IUnitOfWork uow, IMapper mapper, IInvoiceRepository 
         }
     }
 
-    private IEnumerable<InvoiceItemEntity> GenerateItemObjects(IEnumerable<InvoiceEntity> createdInvoices, IEnumerable<OperationEntity> operations)
+    private static List<InvoiceItemEntity> GenerateItemObjects(IEnumerable<InvoiceEntity> createdInvoices, IEnumerable<OperationEntity> operations)
     {
         var invoiceItems = new List<InvoiceItemEntity>();
 
