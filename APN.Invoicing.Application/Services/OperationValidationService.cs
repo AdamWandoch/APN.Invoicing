@@ -18,7 +18,7 @@ public class OperationValidationService(IOperationRepository operationRepo, IUni
 
         if (lastOp == null && operation.Type == EnumOperationType.Start) return true;
 
-        if (lastOp?.Date.UtcDateTime >= operation.Date.UtcDateTime) return false;
+        if (lastOp?.Date >= operation.Date) return false;
 
         return operation.Type switch
         {
