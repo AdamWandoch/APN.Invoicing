@@ -72,13 +72,14 @@ public class OperationRepository(IUnitOfWork unitOfWork) : BaseRepository(unitOf
     public Task<IEnumerable<OperationEntity>> GetOperationsForInvoicing(short month, short year, CancellationToken token)
     {
         var sSql = @"SELECT
-                    	O.OperationID, O.ServiceID, O.CustomerID, O.Quantity,
-                    	O.PricePerDay, O.[Date], O.[Month], O.[Year], O.[Type]
+                        O.OperationID, O.ServiceID, O.CustomerID, O.Quantity,
+                        O.PricePerDay, O.[Date], O.[Month], O.[Year], O.[Type]
                     FROM OPERATION O
+                    LEFT JOIN INVOICE_ITEM II ON O.OperationID = II.StartOperationID OR O.OperationID = II.StopOperationID
                     WHERE O.[Month] = @month 
                         AND O.[Year] = @year
-                        AND NOT EXISTS (SELECT TOP 1 1 FROM INVOICE_ITEM WHERE OperationID = O.OperationID)
-                    ORDER BY [Date] DESC, OperationID DESC";
+                        AND II.InvItemID IS NULL
+                    ORDER BY O.[Date] DESC, O.OperationID DESC";
 
         return _uow.Conn.QueryAsync<OperationEntity>(new CommandDefinition(sSql, new { month, year },
             transaction: _uow.Tx, cancellationToken: token));
