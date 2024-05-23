@@ -6,12 +6,22 @@ public record InvoiceEntity(
     DateTimeOffset Date,
     short Month,
     short Year,
-    List<InvoiceItemEntity> Items);
+    List<InvoiceItemEntity> Items)
+{
+    /// <summary>
+    /// Default, parameterless constructor for object materialization with missing values
+    /// </summary>
+    public InvoiceEntity() : this(default, default, default, default, default, []) { }
+};
+
+
 
 public record InvoiceItemEntity(
     int InvItemID,
     int InvoiceID,
     int ServiceID,
+    int StartOperationID,
+    int StopOperationID,
     DateTimeOffset StartDate,
     DateTimeOffset EndDate,
     short StartMonth,
