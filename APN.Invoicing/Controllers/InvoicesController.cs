@@ -1,4 +1,5 @@
-﻿using APN.Invoicing.Application.ServiceInterfaces;
+﻿using APN.Invoicing.API.Validation;
+using APN.Invoicing.Application.ServiceInterfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace APN.Invoicing.Controllers
@@ -8,11 +9,11 @@ namespace APN.Invoicing.Controllers
         private readonly IInvoiceService _invoiceService = invoiceService;
 
         [HttpPost("calculate")]
-        public async Task<ActionResult> Calculate(short month, short year, CancellationToken token)
+        public async Task<ActionResult> Calculate([FromQuery] CalculateInvoiceParams p, CancellationToken token)
         {
             try
             {
-                return Ok(await _invoiceService.GenerateAsync(month, year, token));
+                return Ok(await _invoiceService.GenerateAsync(p.Month, p.Year, token));
             }
             catch (Exception ex)
             {
@@ -21,11 +22,11 @@ namespace APN.Invoicing.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> Get(short customerID, short month, short year, CancellationToken token)
+        public async Task<ActionResult> Get([FromQuery] GetInvoiceParams p, CancellationToken token)
         {
             try
             {
-                return Ok(await _invoiceService.GetByCustomerMonthYearAsync(customerID, month, year, token));
+                return Ok(await _invoiceService.GetByCustomerMonthYearAsync(p.CustomerID, p.Month, p.Year, token));
             }
             catch (Exception ex)
             {
