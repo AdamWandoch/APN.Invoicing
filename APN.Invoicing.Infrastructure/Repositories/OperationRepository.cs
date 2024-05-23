@@ -16,9 +16,9 @@ public class OperationRepository(IUnitOfWork unitOfWork) : BaseRepository(unitOf
         return _uow.Conn.ExecuteAsync(new CommandDefinition(sSql, operation, transaction: _uow.Tx, cancellationToken: token));
     }
 
-    public Task<EnumOperationType> GetLastTypeByCustomerIDServiceIDAsync(int customerID, int serviceID, short month, short year, CancellationToken token)
+    public Task<OperationEntity?> GetLastOperationByCustomerIDServiceIDAsync(int customerID, int serviceID, short month, short year, CancellationToken token)
     {
-        var sSql = @"SELECT TOP 1 Type FROM OPERATION 
+        var sSql = @"SELECT TOP 1 OperationID, ServiceID, CustomerID, Quantity, PricePerDay, [Date], [Month], [Year], [Type] FROM OPERATION 
                 WHERE CustomerID = @customerID AND ServiceID = @serviceID AND Month = @month AND Year = @year
                 ORDER BY [Date] DESC, OperationID DESC";
 
@@ -30,7 +30,7 @@ public class OperationRepository(IUnitOfWork unitOfWork) : BaseRepository(unitOf
             year
         };
 
-        return _uow.Conn.QueryFirstOrDefaultAsync<EnumOperationType>(new CommandDefinition(
+        return _uow.Conn.QueryFirstOrDefaultAsync<OperationEntity>(new CommandDefinition(
             sSql, param, transaction: _uow.Tx, cancellationToken: token));
     }
 

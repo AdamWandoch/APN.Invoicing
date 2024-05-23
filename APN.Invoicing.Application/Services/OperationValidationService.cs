@@ -14,16 +14,18 @@ public class OperationValidationService(IOperationRepository operationRepo, IUni
 
     public async Task<bool> IsOperationAllowedAsync(OperationPostDTO operation, CancellationToken token)
     {
-        var lastOpType = await _operationRepo.GetLastTypeByCustomerIDServiceIDAsync(operation.CustomerID, operation.ServiceID, operation.Month, operation.Year, token);
+        var lastOp = await _operationRepo.GetLastOperationByCustomerIDServiceIDAsync(operation.CustomerID, operation.ServiceID, operation.Month, operation.Year, token);
 
-        if (lastOpType == 0 && operation.Type == EnumOperationType.Start) return true;
+        if (lastOp == null && operation.Type == EnumOperationType.Start) return true;
+
+        if (lastOp?.Date.UtcDateTime >= operation.Date.UtcDateTime) return false;
 
         return operation.Type switch
         {
-            EnumOperationType.Start => lastOpType == EnumOperationType.Stop,
-            EnumOperationType.Pause => lastOpType == EnumOperationType.Start || lastOpType == EnumOperationType.Restart,
-            EnumOperationType.Restart => lastOpType == EnumOperationType.Pause,
-            EnumOperationType.Stop => lastOpType == EnumOperationType.Start || lastOpType == EnumOperationType.Restart,
+            EnumOperationType.Start => lastOp?.Type == EnumOperationType.Stop,
+            EnumOperationType.Pause => lastOp?.Type == EnumOperationType.Start || lastOp?.Type == EnumOperationType.Restart,
+            EnumOperationType.Restart => lastOp?.Type == EnumOperationType.Pause,
+            EnumOperationType.Stop => lastOp?.Type == EnumOperationType.Start || lastOp?.Type == EnumOperationType.Restart,
             _ => false,
         };
     }
