@@ -13,7 +13,7 @@ public class BaseController<T>(ILogger<T> logger) : ControllerBase
     protected ObjectResult HandleException(Exception ex)
     {
 
-        if (ex is OperationsForInvoicingNotFoundException)
+        if (ex is OperationsForInvoicingNotFoundException or CustomerDataNotFoundException)
         {
             _logger.LogInformation(ex.Message);
             return ObjectResult(ex, StatusCodes.Status409Conflict);
@@ -33,6 +33,7 @@ public class BaseController<T>(ILogger<T> logger) : ControllerBase
     {
         var showStackTrace =
             ex is not OperationsForInvoicingNotFoundException &&
+            ex is not CustomerDataNotFoundException &&
             ex is not ValidationBaseException;
 
         dynamic data = showStackTrace
